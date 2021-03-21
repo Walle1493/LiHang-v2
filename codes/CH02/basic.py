@@ -1,8 +1,5 @@
 import numpy as np
 
-X = np.array([[3, 3], [4, 3], [1, 1]])
-y = [1, 1, -1]
-
 
 class Perceptron(object):
     def __init__(self, learning_rate=1):
@@ -10,7 +7,7 @@ class Perceptron(object):
         self.b = 0
 
     def sign(self, x):
-        return -1 if x < 0 else +1
+        return -1 if x < 0 else 1
 
     def calculate(self, X):
         yH = np.matmul(X, self.w) + self.b
@@ -35,5 +32,8 @@ class Perceptron(object):
 
 
 if __name__ == '__main__':
-    per = Perceptron()
-    per.fit(X, y)
+    X = np.array([[3, 3], [4, 3], [1, 1]])
+    y = [1, 1, -1]
+
+    perceptron = Perceptron()
+    perceptron.fit(X, y)

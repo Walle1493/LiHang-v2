@@ -19,6 +19,7 @@ class Perceptron(object):
         self.verbose = verbose
 
     def fit(self, X, y):
+        import pdb;pdb.set_trace()
         self.w = np.zeros(X.shape[1] + 1)
         # correct_count = 0
         n_iter_ = 0
@@ -65,8 +66,21 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("-p", "--path", required=False, help="path to input data file")
+    ap.add_argument("--path", required=False, help="path to input data file", type=str)
     args = vars(ap.parse_args())
+    args = ap.parse_args()
+
+    # path = "Input/data_2-1.txt"
+    data_raw = np.loadtxt(args.path)
+    X = data_raw[:, :2]
+    y = data_raw[:, -1]
+
+    clf = Perceptron(eta=1, verbose=False)
+    clf.fit(X, y)
+    y_pred = clf.predict(X)
+
+    logger.info(clf.w)
+    logger.info(str(y_pred))
 else:
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
