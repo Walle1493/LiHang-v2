@@ -32,8 +32,11 @@ class Perceptron(object):
 
 
 if __name__ == '__main__':
-    X = np.array([[3, 3], [4, 3], [1, 1]])
-    y = [1, 1, -1]
+    # X = np.array([[3, 3], [4, 3], [1, 1]])
+    # y = [1, 1, -1]
+
+    X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    y = [-1, -1, -1, 1]
 
     perceptron = Perceptron()
     perceptron.fit(X, y)
