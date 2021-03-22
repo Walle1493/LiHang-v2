@@ -105,6 +105,19 @@ class TestSVM(unittest.TestCase):
         clf.fit(data, label)
         print("test_e71_:", clf.alpha, clf.b)
 
+    def test_e711_(self):
+        # use this solver project
+        # data 2.1
+        import pdb;pdb.set_trace()
+        data = np.array([[3, 3, 3],
+                         [4, 3, 4],
+                         [1, 1, 2]])
+        label = np.array([1, 1, -1])
+
+        clf = SVM()
+        clf.fit(data, label)
+        print("test_e71_:", clf.alpha, clf.b)
+
     @unittest.skipIf(skip_flag, "debug")
     def test_e72_(self):
         # use this solver project
