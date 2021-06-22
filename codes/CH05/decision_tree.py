@@ -1,13 +1,11 @@
-from operator import ipow
+from ast import parse
 import numpy as np
 import pandas as pd
 import argparse
 import logging
-import warnings
-import pdb
 
 
-class dt(object):
+class DecisionTree(object):
 
     def __init__(self,
                  tol=10e-3,
@@ -57,12 +55,11 @@ class dt(object):
 
     @staticmethod
     def _cal_entropy(y):
-        pdb.set_trace()
         if y.shape[0] == 0:
             return 0
         unique, cnts = np.unique(y, return_counts=True)
-        freq = cnts/y.shape[0]
-        return -np.sum(freq*np.log2(freq))
+        freq = cnts / y.shape[0]
+        return -np.sum(freq * np.log2(freq))
 
     @staticmethod
     def _cal_conditioanl_entropy(X, y):
@@ -71,18 +68,18 @@ class dt(object):
         rst = 0
         items, cnts = np.unique(X, return_counts=True)
         for item, cnt in zip(items, cnts):
-            ent = dt._cal_entropy(y[X == item])
+            ent = DecisionTree._cal_entropy(y[X == item])
             freq = cnt/X.shape[0]
             rst += freq*ent
         return rst
 
     @staticmethod
     def _gain(X, y):
-        return dt._cal_entropy(y) - dt._cal_conditioanl_entropy(X, y)
+        return DecisionTree._cal_entropy(y) - DecisionTree._cal_conditioanl_entropy(X, y)
 
     @staticmethod
     def _gain_ratio(X, y):
-        return dt._gain(X, y)/dt._cal_entropy(X)
+        return DecisionTree._gain(X, y) / DecisionTree._cal_entropy(X)
 
     @staticmethod
     def _cal_gini(X, y):
@@ -131,26 +128,45 @@ class dt(object):
         return self.tree
 
 
+def ID3(args, logger):
+    raw_data = pd.read_csv(args.path)
+    cols = raw_data.columns
+    X = raw_data[cols[1:-1]]
+    y = raw_data[cols[-1]]
+    # default criterion: gain
+    clf = DecisionTree()
+    clf.fit(X, y)
+    logger.info("ID3 Algorithm")
+    logger.info("Criterion: gain")
+    logger.info("Decision tree:\n%s", clf.tree)
+
+
+def C4_5(args, logger):
+    raw_data = pd.read_csv(args.path)
+    cols = raw_data.columns
+    X = raw_data[cols[1:-1]]
+    y = raw_data[cols[-1]]
+    # criterion: gain_ratio
+    clf = DecisionTree(criterion="gain_ratio")
+    clf.fit(X, y)
+    logger.info("C4.5 Algorithm")
+    logger.info("Criterion: gain_ratio")
+    logger.info("Decision tree:\n%s", clf.tree)
+
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
-    # ap = argparse.ArgumentParser()
-    # ap.add_argument("-p", "--path", required=False, help="path to input data file")
-    # args = vars(ap.parse_args())
-    import pdb
-    # pdb.set_trace()
-    raw_data = pd.read_csv("data/data_5-1.txt")
-    hd = dt._cal_entropy(raw_data[raw_data.columns[-1]])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--path", type=str, default="data/data_5-1.txt")
+    parser.add_argument("--criterion", type=str, default="gain", choices=["gain", "gain_ratio"])
+    args = parser.parse_args()
 
-    rst = np.zeros(raw_data.columns.shape[0] - 1)
-    # note: _gain(ID, y) = ent(y)
-    for idx, col in enumerate(raw_data.columns[1:-1]):
-        hda = dt._gain(raw_data[col], raw_data[raw_data.columns[-1]])
-        logger.info(hda)
-        rst[idx] = hda
-        # print(idx, col, hda)
-    # logger.info(rst)
-    # logger.info(np.argmax(rst))
-    logger.info(hd)
-    # self.assertEqual(np.argmax(rst), 2) # index = 2 -> A3
+    if args.criterion == "gain":
+        ID3(args, logger)
+    elif args.criterion == "gain_ratio":
+        C4_5(args, logger)
+    else:
+        # raise Exception("Wrong parameter \"criterion\"")
+        pass
